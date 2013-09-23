@@ -2,8 +2,10 @@ div ng-app='jobs'
 
   .row
     .col-xs-9.col-md-9
+      h2 Jobs
+
       script data-preload-resource='/jobs'
-        = @jobs.to_json.html_safe
+        == @jobs.to_json
 
       table.table.table-bordered.table-tbody-striped ng-controller='JobsCtrl'
         thead
@@ -21,12 +23,14 @@ div ng-app='jobs'
               | Status
             th Operator
             th In Status
+            th Trolley #
             th Pick
             th Destination
+            th Tags
             th
               .glyphicon.glyphicon-sort.right.pointer ng-click='orderBy("school")'
               | School
-        tbody ng-repeat='group in groups | orderBy:orderPredicate:orderReverse'
+        tbody ng-repeat='group in groups | filter:filterGroup | orderBy:orderPredicate:orderReverse'
           tr ng-show='!group.collapsed && group.jobs.length > 1'
             td.noborder
             td.noborder
@@ -37,7 +41,9 @@ div ng-app='jobs'
             td
             td
             td
+            td
             td ng-bind='group.destination'
+            td
             td
           tr ng-show='group.collapsed'
             td
@@ -48,29 +54,84 @@ div ng-app='jobs'
             td ng-bind='group.status'
             td
             td
+            td ng-bind='group.trolley || "-"'
             td ng-bind='group.pick'
             td ng-bind='group.destination'
-            td ng-bind='group.school'
-          tr ng-repeat='job in group.jobs | orderBy:orderPredicate:orderReverse' ng-show='!group.collapsed'
+            td ng-bind='group.tags || "-"'
+            td ng-bind='group.school || "-"'
+          tr ng-repeat='job in group.jobs | orderBy:orderPredicate:orderReverse | filter:filterJob' ng-show='!group.collapsed'
             td.noborder
             td.noborder
             td
               div ng-show='group.jobs.length == 1' ng-bind='job.job_type'
             td ng-bind='job.created_at | date'
             td ng-bind='job.status'
-            td ng-bind='job.operator'
-            td
+            td ng-bind='job.operator || "-"'
+            td ng-bind='job.status_changed_at | ago'
+            td ng-bind='job.trolley || "-"'
             td ng-bind='job.pick || "-"'
             td
-              div ng-show='group.jobs.length == 1' ng-bind='job.destination'
+              div ng-show='group.jobs.length == 1' ng-bind='job.destination || "-"'
+            td ng-bind='job.tags || "-"'
             td ng-bind='job.school'
 
     .col-xs-3.col-md-3
-      | text2
+      h2 Filter
 
-  h1 Listing jobs
+      script data-preload-resource='/job_types'
+        == Job.pluck(:job_type).uniq.to_json
 
-  table
+      script data-preload-resource='/statuses'
+        == Job.pluck(:status).uniq.to_json
+
+      script data-preload-resource='/filters'
+        == Filter.all.to_json
+
+      div ng-controller='FilterCtrl'
+        h5 Job Type
+        .checkbox ng-repeat='job_type in job_types'
+          label
+            input type='checkbox' ng-model='curFilter.job_types[job_type]'
+            span ng-bind='job_type'
+        br
+
+        h5 Tags
+        .btn-group
+          button.btn.btn-default type='button' ng-class='{ active: curFilter.tags == null }' ng-click='curFilter.tags = null' All
+          button.btn.btn-default type='button' ng-class='{ active: curFilter.tags == true }' ng-click='curFilter.tags = true' With
+          button.btn.btn-default type='button' ng-class='{ active: curFilter.tags == false }' ng-click='curFilter.tags = false' Without
+        br
+        br
+
+        h5 Status
+        select.form-control ng-model='curFilter.status' ng-options='s for s in statuses'
+          option value=''
+            | -- All --
+
+        /h5 School Filter
+        br
+
+        .row
+          .col-md-3
+            button.btn.btn-default ng-click='applyFilter()' Apply Filter
+          .col-md-3
+            input.form-control type='text' ng-model='curFilter.name'
+          .col-md-3
+            button.btn.btn-default ng-click='save()' Save Filter
+          .col-md-3
+            .btn-group ng-class='{ open: filtersOpen }'
+              button.btn.btn-default.dropdown-toggle ng-click='filtersOpen = !filtersOpen'
+                | Load filter
+                span.caret
+              ul.dropdown-menu
+                li ng-repeat='filter in filters'
+                  a href='#' ng-click='setFilter(filter)'
+                    span ng-bind='filter.name'
+
+
+  /h1 Listing jobs
+
+  /table
     tr
       th Status
       th Job type
@@ -83,7 +144,7 @@ div ng-app='jobs'
       th
       th
 
-    - @jobs.each do |job|
+    /- @jobs.each do |job|
       tr
         td = job.status
         td = job.job_type
@@ -96,6 +157,6 @@ div ng-app='jobs'
         td = link_to 'Edit', edit_job_path(job)
         td = link_to 'Destroy', job, :confirm => 'Are you sure?', :method => :delete
 
-  br
+  /br
 
-  = link_to 'New Job', new_job_path
+  /= link_to 'New Job', new_job_path

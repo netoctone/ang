@@ -41,3 +41,4 @@ gem 'anjlab-bootstrap-rails', require: 'bootstrap-rails'
 
 # To use debugger
 # gem 'debugger'
+gem 'pry'

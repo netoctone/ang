@@ -1,4 +1,7 @@
 Ang::Application.routes.draw do
+  resources :filters
+
+
   resources :jobs
 
 
