@@ -1,0 +1,101 @@
+div ng-app='jobs'
+
+  .row
+    .col-xs-9.col-md-9
+      script data-preload-resource='/jobs'
+        = @jobs.to_json.html_safe
+
+      table.table.table-bordered.table-tbody-striped ng-controller='JobsCtrl'
+        thead
+          tr
+            th
+            th
+            th
+              .glyphicon.glyphicon-sort.right.pointer ng-click='orderBy("job_type")'
+              | Job Type
+            th
+              .glyphicon.glyphicon-sort.right.pointer ng-click='orderBy("created_at")'
+              | Created
+            th
+              .glyphicon.glyphicon-sort.right.pointer ng-click='orderBy("status")'
+              | Status
+            th Operator
+            th In Status
+            th Pick
+            th Destination
+            th
+              .glyphicon.glyphicon-sort.right.pointer ng-click='orderBy("school")'
+              | School
+        tbody ng-repeat='group in groups | orderBy:orderPredicate:orderReverse'
+          tr ng-show='!group.collapsed && group.jobs.length > 1'
+            td.noborder
+            td.noborder
+              .glyphicon.glyphicon-folder-open.pointer ng-click='group.collapsed = true'
+            td ng-bind='group.job_type'
+            td
+            td
+            td
+            td
+            td
+            td ng-bind='group.destination'
+            td
+          tr ng-show='group.collapsed'
+            td
+            td
+              .glyphicon.glyphicon-folder-close.pointer ng-click='group.collapsed = false'
+            td ng-bind='group.job_type'
+            td ng-bind='group.created_at | date'
+            td ng-bind='group.status'
+            td
+            td
+            td ng-bind='group.pick'
+            td ng-bind='group.destination'
+            td ng-bind='group.school'
+          tr ng-repeat='job in group.jobs | orderBy:orderPredicate:orderReverse' ng-show='!group.collapsed'
+            td.noborder
+            td.noborder
+            td
+              div ng-show='group.jobs.length == 1' ng-bind='job.job_type'
+            td ng-bind='job.created_at | date'
+            td ng-bind='job.status'
+            td ng-bind='job.operator'
+            td
+            td ng-bind='job.pick || "-"'
+            td
+              div ng-show='group.jobs.length == 1' ng-bind='job.destination'
+            td ng-bind='job.school'
+
+    .col-xs-3.col-md-3
+      | text2
+
+  h1 Listing jobs
+
+  table
+    tr
+      th Status
+      th Job type
+      th Operator
+      th Status changed at
+      th Destination
+      th Pick
+      th School
+      th
+      th
+      th
+
+    - @jobs.each do |job|
+      tr
+        td = job.status
+        td = job.job_type
+        td = job.operator
+        td = job.status_changed_at
+        td = job.destination
+        td = job.pick
+        td = job.school
+        td = link_to 'Show', job
+        td = link_to 'Edit', edit_job_path(job)
+        td = link_to 'Destroy', job, :confirm => 'Are you sure?', :method => :delete
+
+  br
+
+  = link_to 'New Job', new_job_path

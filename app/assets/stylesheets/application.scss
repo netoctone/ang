@@ -11,3 +11,37 @@
  *= require_self
  *= require_tree .
  */
+
+@import 'twitter/bootstrap';
+
+.fluid-container {
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.table-tbody-striped {
+  tbody:nth-child(odd) > tr > td {
+    background-color: #f9f9f9;
+  }
+}
+
+.table-bordered {
+  tbody {
+    tr {
+      td.noborder {
+        border: 0px;
+        border-left: 1px solid #ddd;
+      }
+    }
+  }
+}
+
+.right {
+  float: right;
+}
+
+.pointer {
+  cursor: pointer;
+}

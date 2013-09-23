@@ -1,0 +1,27 @@
+p#notice = notice
+
+p
+  strong Status:
+  = @job.status
+p
+  strong Job type:
+  = @job.job_type
+p
+  strong Operator:
+  = @job.operator
+p
+  strong Status changed at:
+  = @job.status_changed_at
+p
+  strong Destination:
+  = @job.destination
+p
+  strong Pick:
+  = @job.pick
+p
+  strong School:
+  = @job.school
+
+= link_to 'Edit', edit_job_path(@job)
+'|
+= link_to 'Back', jobs_path

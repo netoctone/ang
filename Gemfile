@@ -20,6 +20,9 @@ group :assets do
   gem 'uglifier', '>= 1.0.3'
 end
 
+gem 'slim'
+gem 'slim-rails'
+
 #gem 'jquery-rails'
 gem 'angularjs-rails'
 gem 'anjlab-bootstrap-rails', require: 'bootstrap-rails'
